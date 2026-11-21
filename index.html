@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OG WATCH — Time Redefined</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- Reset ---------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{
+  background:#0a0a0a;color:#f5f5f5;font-family:'Inter',sans-serif;
+  overflow-x:hidden;cursor:none;
+}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+::selection{background:#f5e400;color:#000}
+
+/* ---------- Custom cursor ---------- */
+.cursor{
+  position:fixed;width:14px;height:14px;border-radius:50%;
+  background:#fff;pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);mix-blend-mode:difference;
+  transition:width .25s,height .25s,background .25s,opacity .2s;
+  opacity:0;left:-30px;top:-30px;
+}
+.cursor.big{width:60px;height:60px;background:rgba(245,228,0,.0)}
+.cursor-ring{
+  position:fixed;width:34px;height:34px;border:1px solid rgba(255,255,255,.4);
+  border-radius:50%;pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);transition:transform .12s ease-out,opacity .25s,border-color .25s;
+  opacity:0;left:-60px;top:-60px;
+}
+.cursor-ring.grow{transform:translate(-50%,-50%) scale(2.4);border-color:#f5e400}
+@media (hover:none){
+  body{cursor:auto}.cursor,.cursor-ring{display:none}
+}
+
+/* ---------- Typography helpers ---------- */
+.mono{font-family:'Space Mono',monospace;letter-spacing:.18em;text-transform:uppercase;font-size:11px}
+.eyebrow{font-family:'Space Mono',monospace;letter-spacing:.22em;text-transform:uppercase;font-size:10px;color:#8a8a8a}
+.display{font-family:'Archivo Black','Inter',sans-serif;font-weight:900;letter-spacing:-.02em;line-height:.92}
+.outline{
+  -webkit-text-stroke:1.4px #6a6a6a;color:transparent;
+  font-family:'Archivo Black','Inter',sans-serif;font-weight:900;letter-spacing:-.02em;line-height:.92;
+}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px clamp(18px,4vw,48px);
+  background:linear-gradient(180deg,rgba(10,10,10,.92),rgba(10,10,10,0));
+  backdrop-filter:blur(6px);
+  transition:padding .3s,background .3s;
+}
+.topbar.scrolled{background:rgba(10,10,10,.92);padding:12px clamp(18px,4vw,48px);border-bottom:1px solid rgba(255,255,255,.06)}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand .og{font-family:'Archivo Black',sans-serif;font-size:clamp(20px,2.4vw,26px);letter-spacing:-.02em;line-height:1}
+.brand .sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.28em;color:#9a9a9a;text-transform:uppercase}
+.nav{display:flex;gap:clamp(14px,2vw,36px);align-items:center}
+.nav a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#cfcfcf;position:relative;transition:color .25s}
+.nav a::after{content:"";position:absolute;left:0;bottom:-6px;height:1px;width:0;background:#f5e400;transition:width .3s}
+.nav a:hover{color:#fff}.nav a:hover::after{width:100%}
+.nav-right{display:flex;gap:22px;align-items:center}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:none}
+.burger span{width:22px;height:1.5px;background:#fff;transition:.3s}
+
+/* ---------- Hero ---------- */
+.hero{
+  min-height:100vh;position:relative;padding:120px clamp(18px,5vw,80px) 60px;
+  display:grid;grid-template-columns:1.1fr 1fr;align-items:center;gap:40px;
+  overflow:hidden;
+}
+.hero-copy{position:relative;z-index:3}
+.hero-copy .eyebrow{margin-bottom:22px;display:block}
+.hero h1{font-size:clamp(56px,11vw,170px)}
+.hero h1 .solid{display:block}
+.hero h1 .outline{display:block;margin-top:-.04em;font-size:clamp(48px,9.5vw,150px);transform:translateX(.06em)}
+.hero-tag{margin-top:26px;max-width:380px;color:#bdbdbd;font-size:15px;line-height:1.7;font-weight:300}
+.hero-ctas{margin-top:34px;display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  padding:15px 24px;border:1px solid #2c2c2c;color:#fff;border-radius:2px;
+  transition:background .25s,color .25s,border-color .25s,transform .25s;
+}
+.btn:hover{background:#f5e400;color:#0a0a0a;border-color:#f5e400;transform:translateY(-2px)}
+.btn .arrow{transition:transform .25s}.btn:hover .arrow{transform:translate(3px,-3px)}
+.btn-link{
+  display:inline-flex;align-items:center;gap:10px;color:#bdbdbd;font-size:11px;
+  font-family:'Space Mono',monospace;letter-spacing:.2em;text-transform:uppercase;
+  border-bottom:1px solid transparent;transition:.25s;
+}
+.btn-link:hover{color:#f5e400;border-color:#f5e400}
+.hero-visual{position:relative;height:clamp(360px,60vh,560px);display:flex;align-items:center;justify-content:center}
+.hero-visual::before{
+  content:"";position:absolute;width:78%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 50% 45%,rgba(245,228,0,.10),transparent 60%);
+  filter:blur(20px);
+}
+.hero-watch{
+  position:relative;width:78%;max-width:420px;height:100%;object-fit:cover;
+  border-radius:8px;filter:brightness(1.05) contrast(1.1) saturate(.95);
+  box-shadow:0 30px 80px rgba(0,0,0,.7);
+}
+.live-clock{
+  position:absolute;right:0;bottom:-20px;display:flex;flex-direction:column;align-items:flex-end;gap:4px;
+  font-family:'Space Mono',monospace;
+}
+.live-clock .dot{width:8px;height:8px;border-radius:50%;background:#f5e400;box-shadow:0 0 12px #f5e400;display:inline-block;margin-right:6px;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.live-clock .time{font-size:14px;color:#f5e400;letter-spacing:.08em}
+.live-clock .lab{font-size:9px;letter-spacing:.2em;color:#8a8a8a;text-transform:uppercase}
+.scroll-hint{
+  position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.3em;color:#6a6a6a;
+  text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.scroll-hint .line{width:1px;height:32px;background:linear-gradient(180deg,#6a6a6a,transparent);animation:scrolldown 2s infinite}
+@keyframes scrolldown{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}50.1%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ---------- Live Clock section ---------- */
+.live-section{padding:120px clamp(18px,5vw,80px);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);background:#070707}
+.live-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,80px);align-items:center}
+.live-grid .text p{font-size:clamp(16px,2vw,21px);line-height:1.7;color:#cfcfcf;font-weight:300;max-width:520px}
+.live-grid .text .eyebrow{margin-bottom:20px;display:block}
+.data-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1c1c1c;border:1px solid #1c1c1c}
+.data-cell{background:#0a0a0a;padding:28px 24px}
+.data-cell .k{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;color:#8a8a8a;text-transform:uppercase;margin-bottom:12px}
+.data-cell .v{font-size:clamp(18px,2.2vw,26px);color:#fff;font-weight:500;font-family:'Space Mono',monospace;letter-spacing:.02em;word-break:break-word}
+.data-cell .v small{color:#f5e400;font-size:11px;letter-spacing:.2em;margin-left:8px}
+
+/* ---------- Section heading ---------- */
+.section{padding:120px clamp(18px,5vw,80px);position:relative}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;margin-bottom:50px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:30px}
+.section-head .left{max-width:560px}
+.section-head h2{font-family:'Archivo Black',sans-serif;font-size:clamp(36px,6vw,80px);letter-spacing:-.02em;line-height:.95;margin-top:14px}
+.section-head h2 .out{-webkit-text-stroke:1.2px #3a3a3a;color:transparent}
+.section-head .right{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.18em;color:#9a9a9a;text-transform:uppercase;text-align:right;line-height:1.9}
+
+/* ---------- Collection masonry ---------- */
+.collection-grid{
+  display:grid;grid-template-columns:repeat(12,1fr);gap:18px;grid-auto-flow:dense;
+}
+.card{
+  position:relative;overflow:hidden;border-radius:4px;background:#111;cursor:none;
+  transition:transform .5s ease;
+}
+.card .img-wrap{overflow:hidden;height:100%}
+.card img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.7,.3,1),filter .5s;filter:brightness(.78) contrast(1.05)}
+.card:hover img{transform:scale(1.06);filter:brightness(1) contrast(1.1)}
+.card .meta{position:absolute;left:0;right:0;bottom:0;padding:20px 22px;
+  background:linear-gradient(0deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.4) 60%,transparent 100%);
+  transform:translateY(6px);transition:transform .5s;opacity:.95;
+}
+.card:hover .meta{transform:translateY(0)}
+.card .meta .name{font-family:'Archivo Black',sans-serif;font-size:20px;letter-spacing:-.01em;margin-bottom:6px}
+.card .meta .spec{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.18em;color:#bdbdbd;text-transform:uppercase}
+.card .meta .price{position:absolute;right:22px;bottom:20px;font-family:'Space Mono',monospace;font-size:13px;color:#f5e400}
+.card .tag-new{position:absolute;top:14px;left:14px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.22em;color:#0a0a0a;background:#f5e400;padding:5px 9px;text-transform:uppercase;border-radius:2px}
+
+.card.w6{grid-column:span 6;aspect-ratio:4/3}
+.card.w5{grid-column:span 5;aspect-ratio:4/5}
+.card.w4{grid-column:span 4;aspect-ratio:1/1}
+.card.w7{grid-column:span 7;aspect-ratio:16/10}
+.card.w8{grid-column:span 8;aspect-ratio:16/9}
+.card.offset{margin-top:60px}
+
+/* ---------- Beast section ---------- */
+.beast{
+  min-height:90vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  position:relative;text-align:center;padding:140px clamp(18px,5vw,80px);overflow:hidden;
+  background:radial-gradient(ellipse at center,#101010 0%,#050505 100%);
+}
+.beast-img{position:absolute;inset:0;opacity:.42;object-fit:cover;width:100%;height:100%;filter:grayscale(.3) contrast(1.1)}
+.beast-content{position:relative;z-index:2;max-width:900px}
+.beast .eyebrow{margin-bottom:24px;display:inline-block}
+.beast h2{font-family:'Archivo Black',sans-serif;font-size:clamp(64px,13vw,200px);line-height:.85;letter-spacing:-.04em}
+.beast h2 .out{-webkit-text-stroke:1.6px #5a5a5a;color:transparent;display:block}
+.beast p{margin-top:30px;max-width:560px;margin-left:auto;margin-right:auto;color:#cfcfcf;font-weight:300;font-size:16px;line-height:1.7}
+.beast .stats{margin-top:50px;display:flex;justify-content:center;gap:clamp(30px,6vw,80px);flex-wrap:wrap}
+.beast .stat .n{font-family:'Archivo Black',sans-serif;font-size:clamp(36px,5vw,60px);color:#f5e400}
+.beast .stat .l{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;color:#9a9a9a;text-transform:uppercase;margin-top:6px}
+
+/* ---------- Craft split ---------- */
+.craft{padding:140px clamp(18px,5vw,80px);background:#080808;border-top:1px solid rgba(255,255,255,.06)}
+.craft-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,80px);align-items:center}
+.craft-img{aspect-ratio:4/5;width:100%;object-fit:cover;border-radius:4px;filter:contrast(1.05)}
+.craft-text .eyebrow{margin-bottom:18px;display:block}
+.craft-text h2{font-family:'Archivo Black',sans-serif;font-size:clamp(34px,5vw,64px);line-height:.95;letter-spacing:-.02em;margin-bottom:24px}
+.craft-text p{color:#cfcfcf;font-weight:300;line-height:1.75;font-size:15px;margin-bottom:18px;max-width:520px}
+.craft-list{list-style:none;margin-top:28px;display:grid;gap:14px}
+.craft-list li{display:flex;justify-content:space-between;gap:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.craft-list .k{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.18em;color:#9a9a9a;text-transform:uppercase}
+.craft-list .v{font-family:'Space Mono',monospace;font-size:12px;color:#fff}
+
+/* ---------- Technology / Movement ---------- */
+.tech{padding:140px clamp(18px,5vw,80px);position:relative;overflow:hidden}
+.tech-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22;filter:grayscale(.4) contrast(1.1)}
+.tech-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,80px);align-items:center}
+.tech-text .eyebrow{margin-bottom:18px;display:block}
+.tech-text h2{font-family:'Archivo Black',sans-serif;font-size:clamp(34px,5vw,64px);line-height:.95;letter-spacing:-.02em;margin-bottom:24px}
+.tech-text h2 .out{-webkit-text-stroke:1.2px #3a3a3a;color:transparent}
+.tech-text p{color:#cfcfcf;font-weight:300;line-height:1.75;font-size:15px;margin-bottom:14px;max-width:520px}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1c1c1c;border:1px solid #1c1c1c;border-radius:4px;overflow:hidden}
+.spec{background:#0a0a0a;padding:24px}
+.spec .k{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;color:#9a9a9a;text-transform:uppercase;margin-bottom:10px}
+.spec .v{font-family:'Archivo Black',sans-serif;font-size:clamp(22px,3vw,32px);color:#fff;letter-spacing:-.01em}
+
+/* ---------- Story / Quote ---------- */
+.story{padding:140px clamp(18px,5vw,80px);text-align:center;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);background:#070707}
+.story .eyebrow{display:block;margin-bottom:28px}
+.story blockquote{font-family:'Archivo Black',sans-serif;font-size:clamp(26px,5vw,54px);line-height:1.08;letter-spacing:-.02em;max-width:1000px;margin:0 auto;color:#fff}
+.story blockquote .out{-webkit-text-stroke:1.2px #8a8a8a;color:#1a1a1a}
+.story cite{display:block;margin-top:36px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.22em;color:#9a9a9a;text-transform:uppercase;font-style:normal}
+
+/* ---------- Newsletter ---------- */
+.news{padding:120px clamp(18px,5vw,80px);text-align:center;background:#0a0a0a}
+.news .eyebrow{margin-bottom:20px;display:block}
+.news h2{font-family:'Archivo Black',sans-serif;font-size:clamp(32px,5vw,56px);line-height:1;margin-bottom:22px;letter-spacing:-.02em;color:#fff}
+.news p{color:#cfcfcf;max-width:520px;margin:0 auto 36px;font-weight:300;line-height:1.7}
+.news form{display:flex;justify-content:center;gap:0;max-width:480px;margin:0 auto;flex-wrap:wrap}
+.news input{flex:1;min-width:220px;background:#141414;border:1px solid #2c2c2c;color:#fff;padding:16px 20px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.05em}
+.news input::placeholder{color:#6a6a6a}
+.news input:focus{outline:none;border-color:#f5e400;background:#1a1a1a}
+.news button{background:#f5e400;color:#0a0a0a;border:1px solid #f5e400;padding:16px 28px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;cursor:none;font-weight:700;transition:background .25s,transform .25s}
+.news button:hover{background:#fff;border-color:#fff;transform:translateY(-2px)}
+
+/* ---------- Footer ---------- */
+.footer{padding:80px clamp(18px,5vw,80px) 40px;border-top:1px solid rgba(255,255,255,.08);background:#050505}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:60px}
+.footer-brand .og{font-family:'Archivo Black',sans-serif;font-size:clamp(40px,7vw,90px);line-height:.9;letter-spacing:-.03em}
+.footer-brand .og .out{-webkit-text-stroke:1.4px #3a3a3a;color:transparent}
+.footer-brand p{margin-top:18px;color:#9a9a9a;font-weight:300;line-height:1.7;max-width:360px;font-size:13px}
+.footer-col h4{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.22em;color:#9a9a9a;text-transform:uppercase;margin-bottom:18px}
+.footer-col ul{list-style:none;display:grid;gap:12px}
+.footer-col a{color:#cfcfcf;font-size:13px;transition:color .25s;display:inline-flex;align-items:center;gap:6px}
+.footer-col a:hover{color:#f5e400}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;padding-top:30px;border-top:1px solid rgba(255,255,255,.06);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6a6a6a;text-transform:uppercase}
+.footer-bottom .time{color:#f5e400}
+
+/* ---------- Mobile ---------- */
+@media (max-width:880px){
+  .nav{display:none}
+  .burger{display:flex}
+  .hero{grid-template-columns:1fr;min-height:auto;padding:110px clamp(18px,5vw,24px) 60px}
+  .hero-visual{height:55vh;margin-top:36px;width:100%}
+  .hero-visual::before{width:90%}
+  .hero-watch{width:100%;max-width:none}
+  .hero h1 .outline{font-size:clamp(40px,12vw,80px)}
+  .live-grid{grid-template-columns:1fr}
+  .craft-grid{grid-template-columns:1fr}
+  .tech-inner{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:36px}
+  .footer-brand{grid-column:1/-1}
+  .collection-grid .card.w6,.collection-grid .card.w5,.collection-grid .card.w7,.collection-grid .card.w8,.collection-grid .card.w4{grid-column:span 12;aspect-ratio:4/3;margin-top:0}
+  .collection-grid .card.w4{aspect-ratio:1/1}
+  .card.offset{margin-top:0}
+  .beast h2{font-size:clamp(54px,18vw,110px)}
+  .beast .stat .n{font-size:34px}
+  .section-head{align-items:flex-start}
+  .section-head .right{text-align:left}
+}
+@media (max-width:560px){
+  .footer-grid{grid-template-columns:1fr}
+  .hero-ctas{flex-direction:column;align-items:flex-start;gap:18px;width:100%}
+  .btn{width:100%;justify-content:center}
+  .data-grid{grid-template-columns:1fr 1fr}
+  .specs{grid-template-columns:1fr}
+  .topbar{padding:16px 18px}
+  .news form{flex-direction:column}
+  .news input{width:100%}
+  .news button{width:100%}
+}
+
+/* ---------- Mobile nav drawer ---------- */
+.drawer{
+  position:fixed;inset:0;background:#0a0a0a;z-index:2000;
+  transform:translateX(100%);transition:transform .45s cubic-bezier(.7,0,.2,1);
+  display:flex;flex-direction:column;justify-content:center;padding:60px clamp(28px,8vw,80px);
+}
+.drawer.open{transform:translateX(0)}
+.drawer .close{position:absolute;top:24px;right:24px;background:none;border:0;color:#fff;font-size:30px;cursor:none}
+.drawer a{font-family:'Archivo Black',sans-serif;font-size:clamp(34px,8vw,60px);color:#fff;padding:10px 0;letter-spacing:-.02em;transition:.25s;display:flex;align-items:center;gap:14px}
+.drawer a .n{font-family:'Space Mono',monospace;font-size:11px;color:#6a6a6a;letter-spacing:.2em}
+.drawer a:hover{color:#f5e400;padding-left:8px}
+.drawer .socials{margin-top:48px;display:flex;gap:24px;flex-wrap:wrap}
+.drawer .socials a{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.2em;color:#9a9a9a;text-transform:uppercase}
+
+/* Reveal-on-scroll */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .9s cubic-bezier(.2,.7,.3,1),transform .9s cubic-bezier(.2,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* marquee */
+.marquee{overflow:hidden;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);padding:18px 0;background:#070707}
+.marquee-track{display:flex;gap:50px;animation:marquee 28s linear infinite;white-space:nowrap;width:max-content}
+.marquee-track span{font-family:'Archivo Black',sans-serif;font-size:clamp(20px,3vw,32px);letter-spacing:-.01em;color:#1c1c1c;-webkit-text-stroke:.8px #4a4a4a;text-transform:uppercase}
+.marquee-track span:nth-child(odd){color:#fff;-webkit-text-stroke:0}
+.marquee-track .dot{color:#f5e400;-webkit-text-stroke:0}
+@keyframes marquee{to{transform:translateX(-50%)}}
+</style>
+</head>
+<body>
+
+<!-- custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- TOP BAR -->
+<header class="topbar" id="topbar">
+  <a href="#top" class="brand">
+    <span class="og">OG</span>
+    <span class="sub">Watch</span>
+  </a>
+  <nav class="nav">
+    <a href="#collection">Collection</a>
+    <a href="#craft">Craft</a>
+    <a href="#beast">Beast</a>
+    <a href="#technology">Technology</a>
+  </nav>
+  <div class="nav-right">
+    <a href="#shop" class="mono">Shop</a>
+    <a href="#contact" class="mono">Contact</a>
+    <button class="burger" id="burger" aria-label="menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- MOBILE DRAWER -->
+<div class="drawer" id="drawer">
+  <button class="close" id="drawerClose">&times;</button>
+  <a href="#collection"><span class="n">01</span>Collection</a>
+  <a href="#craft"><span class="n">02</span>Craft</a>
+  <a href="#beast"><span class="n">03</span>Beast</a>
+  <a href="#technology"><span class="n">04</span>Technology</a>
+  <a href="#shop"><span class="n">05</span>Shop</a>
+  <a href="#contact"><span class="n">06</span>Contact</a>
+  <div class="socials">
+    <a href="#">Instagram</a>
+    <a href="#">Pinterest</a>
+    <a href="#">Email</a>
+    <a href="#">Pakistan / Worldwide</a>
+  </div>
+</div>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-copy reveal">
+    <span class="eyebrow">Mechanical Watchmaking / 01</span>
+    <h1>
+      <span class="solid display">Time</span>
+      <span class="outline">Redefined</span>
+    </h1>
+    <p class="hero-tag">A modern mechanical object built around one simple idea — make every second feel considered. Engineered in Pakistan. Worn worldwide.</p>
+    <div class="hero-ctas">
+      <a href="#collection" class="btn">Discover Collection <span class="arrow">↗</span></a>
+      <a href="#craft" class="btn-link">Explore the craft <span>→</span></a>
+    </div>
+  </div>
+  <div class="hero-visual reveal">
+    <img class="hero-watch" src="assets/watch_01_00.jpg" alt="OG mechanical watch — black dial, moody studio shot">
+    <div class="live-clock">
+      <span class="lab"><span class="dot"></span>Live · PKT</span>
+      <span class="time" id="heroTime">00:00:00</span>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <span class="line"></span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>Mechanical</span><span class="dot">●</span><span>Automatic</span><span class="dot">●</span><span>Stainless</span><span class="dot">●</span><span>Sapphire</span><span class="dot">●</span><span>200M Water Resistant</span><span class="dot">●</span><span>Made for every second</span><span class="dot">●</span>
+    <span>Mechanical</span><span class="dot">●</span><span>Automatic</span><span class="dot">●</span><span>Stainless</span><span class="dot">●</span><span>Sapphire</span><span class="dot">●</span><span>200M Water Resistant</span><span class="dot">●</span><span>Made for every second</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- LIVE CLOCK / TIME -->
+<section class="live-section" id="live">
+  <div class="live-grid">
+    <div class="text reveal">
+      <span class="eyebrow">Real Time / 02</span>
+      <p>A live clock keeps the experience connected to real time — reflecting the same principle behind a mechanical timepiece: every second is measured, visible and meaningful.</p>
+    </div>
+    <div class="data-grid reveal">
+      <div class="data-cell"><div class="k">Local Time</div><div class="v" id="localTime">--:--:--</div></div>
+      <div class="data-cell"><div class="k">Date</div><div class="v" id="localDate">--</div></div>
+      <div class="data-cell"><div class="k">Time Zone</div><div class="v" id="tz">--</div></div>
+      <div class="data-cell"><div class="k">Status</div><div class="v">Live<small>Synced</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION -->
+<section class="section" id="collection">
+  <div class="section-head reveal">
+    <div class="left">
+      <span class="eyebrow">The Collection / 03</span>
+      <h2>Selected <span class="out">Watches.</span></h2>
+    </div>
+    <div class="right">Mechanical &amp; Automatic<br>Everyday wear<br>06 references</div>
+  </div>
+
+  <div class="collection-grid">
+    <a href="#" class="card w6 reveal">
+      <div class="img-wrap"><img src="assets/watch_01_02.jpg" alt="OG Noir chronograph"></div>
+      <span class="tag-new">New</span>
+      <div class="meta">
+        <div class="name">OG Noir</div>
+        <div class="spec">Automatic · Black · 42mm</div>
+        <div class="price">$420</div>
+      </div>
+    </a>
+    <a href="#" class="card w6 offset reveal">
+      <div class="img-wrap"><img src="assets/watch_02_07.jpg" alt="OG Beast diver"></div>
+      <div class="meta">
+        <div class="name">OG Beast</div>
+        <div class="spec">Automatic · Steel · 200m</div>
+        <div class="price">$560</div>
+      </div>
+    </a>
+    <a href="#" class="card w4 reveal">
+      <div class="img-wrap"><img src="assets/watch_03_12.jpg" alt="OG Heritage leather"></div>
+      <div class="meta">
+        <div class="name">OG Heritage</div>
+        <div class="spec">Automatic · Leather · Classic</div>
+        <div class="price">$390</div>
+      </div>
+    </a>
+    <a href="#" class="card w4 reveal">
+      <div class="img-wrap"><img src="assets/watch_05_24.jpg" alt="OG Champagne dress"></div>
+      <span class="tag-new">New</span>
+      <div class="meta">
+        <div class="name">OG Champagne</div>
+        <div class="spec">Dress · Steel · 38mm</div>
+        <div class="price">$480</div>
+      </div>
+    </a>
+    <a href="#" class="card w4 reveal">
+      <div class="img-wrap"><img src="assets/watch_06_30.jpg" alt="OG Minimalist"></div>
+      <div class="meta">
+        <div class="name">OG Slate</div>
+        <div class="spec">Automatic · Slate · 40mm</div>
+        <div class="price">$340</div>
+      </div>
+    </a>
+    <a href="#" class="card w7 reveal">
+      <div class="img-wrap"><img src="assets/watch_02_09.jpg" alt="OG Diver"></div>
+      <div class="meta">
+        <div class="name">OG Aquatic</div>
+        <div class="spec">Automatic · Steel · 300m</div>
+        <div class="price">$620</div>
+      </div>
+    </a>
+    <a href="#" class="card w5 reveal">
+      <div class="img-wrap"><img src="assets/watch_01_04.jpg" alt="OG Steel"></div>
+      <div class="meta">
+        <div class="name">OG Steel</div>
+        <div class="spec">Automatic · Steel · 40mm</div>
+        <div class="price">$460</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- BEAST -->
+<section class="beast" id="beast">
+  <img class="beast-img" src="assets/watch_02_08.jpg" alt="">
+  <div class="beast-content reveal">
+    <span class="eyebrow">The Beast / 04</span>
+    <h2>THE<br><span class="out">BEAST</span></h2>
+    <p>200m water resistant. Sapphire crystal. 42mm bead-blasted steel case. Engineered for the wrist that never sits still — built to take the hit, designed to keep the time.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">200m</div><div class="l">Water Resistant</div></div>
+      <div class="stat"><div class="n">42mm</div><div class="l">Steel Case</div></div>
+      <div class="stat"><div class="n">72h</div><div class="l">Power Reserve</div></div>
+      <div class="stat"><div class="n">Sapphire</div><div class="l">Crystal</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CRAFT -->
+<section class="craft" id="craft">
+  <div class="craft-grid">
+    <img class="craft-img reveal" src="assets/watch_03_13.jpg" alt="Watchmaker craft detail">
+    <div class="craft-text reveal">
+      <span class="eyebrow">The Craft / 05</span>
+      <h2>Shaped by hand.<br>Set in steel.</h2>
+      <p>Each OG timepiece is assembled by hand — every gear set, every jewel placed, every case finished in our workshop. We make a small number of watches, and we make them properly.</p>
+      <p>No shortcuts, no compromise on the materials that matter: 316L stainless steel, sapphire crystal, genuine leather, and a mechanical movement we are proud to put our name on.</p>
+      <ul class="craft-list">
+        <li><span class="k">Movement</span><span class="v">Automatic, 25 jewels</span></li>
+        <li><span class="k">Case</span><span class="v">316L Stainless Steel</span></li>
+        <li><span class="k">Crystal</span><span class="v">Sapphire, anti-reflective</span></li>
+        <li><span class="k">Strap</span><span class="v">Italian leather / steel</span></li>
+        <li><span class="k">Warranty</span><span class="v">5 years international</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- TECHNOLOGY -->
+<section class="tech" id="technology">
+  <img class="tech-img" src="assets/watch_04_23.jpg" alt="">
+  <div class="tech-inner">
+    <div class="tech-text reveal">
+      <span class="eyebrow">Technology / 06</span>
+      <h2>The movement <span class="out">behind it.</span></h2>
+      <p>At the heart of every OG watch is a self-winding mechanical movement. No batteries, no quartz tick — just a mainspring, a rotor and 25 jewels keeping beat, second after second.</p>
+      <p>It is a 200-year-old idea, refined to its essentials. When you wear an OG, you are wearing a tiny machine that lives as long as you keep it moving.</p>
+    </div>
+    <div class="specs reveal">
+      <div class="spec"><div class="k">Frequency</div><div class="v">28,800 vph</div></div>
+      <div class="spec"><div class="k">Power Reserve</div><div class="v">72 hrs</div></div>
+      <div class="spec"><div class="k">Jewels</div><div class="v">25</div></div>
+      <div class="spec"><div class="k">Accuracy</div><div class="v">-4/+6 s/d</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="story">
+  <span class="eyebrow reveal">OG Philosophy / 07</span>
+  <blockquote class="reveal">
+    Every second is measured,<br>visible and meaningful.
+  </blockquote>
+  <cite class="reveal">— OG Watch, Pakistan</cite>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="news" id="contact">
+  <span class="eyebrow reveal">Stay In Time</span>
+  <h2 class="reveal">Join the OG list.</h2>
+  <p class="reveal">First access to new releases, restocks and limited runs. One email a month, no noise.</p>
+  <form class="reveal" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Subscribed ✓';">
+    <input type="email" placeholder="your@email.com" required>
+    <button type="submit">Subscribe</button>
+  </form>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer" id="shop">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="og">OG<br><span class="out">WATCH</span></div>
+      <p>Mechanical timepieces shaped by proportion, material and precision — made for everyday wear and long-term ownership.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="#collection">Collection</a></li>
+        <li><a href="#craft">Craft</a></li>
+        <li><a href="#beast">The Beast</a></li>
+        <li><a href="#technology">Technology</a></li>
+        <li><a href="#">Story</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Pinterest</a></li>
+        <li><a href="#">Email</a></li>
+        <li><a href="#">Pakistan / Worldwide</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#">All Watches</a></li>
+        <li><a href="#">Straps</a></li>
+        <li><a href="#">Accessories</a></li>
+        <li><a href="#">Care &amp; Service</a></li>
+        <li><a href="#">Warranty</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 OG Watch — Pakistan</span>
+    <span class="time" id="footerTime">PKT 00:00:00</span>
+    <span>This template is made with shahroz khan</span>
+    
+  </div>
+</footer>
+
+<script>
+/* ---- custom cursor ---- */
+(function(){
+  const cursor=document.getElementById('cursor');
+  const ring=document.getElementById('cursorRing');
+  let rx=0,ry=0,cx=0,cy=0;
+  window.addEventListener('mousemove',e=>{
+    cx=e.clientX;cy=e.clientY;
+    cursor.style.left=cx+'px';cursor.style.top=cy+'px';
+    cursor.style.opacity='1';ring.style.opacity='1';
+  });
+  function loop(){
+    rx+=(cx-rx)*0.18;ry+=(cy-ry)*0.18;
+    ring.style.left=rx+'px';ring.style.top=ry+'px';
+    requestAnimationFrame(loop);
+  }
+  loop();
+  document.querySelectorAll('a,button,.card,input').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cursor.classList.add('big');ring.classList.add('grow')});
+    el.addEventListener('mouseleave',()=>{cursor.classList.remove('big');ring.classList.remove('grow')});
+  });
+})();
+
+/* ---- topbar scrolled state ---- */
+const topbar=document.getElementById('topbar');
+window.addEventListener('scroll',()=>{
+  if(window.scrollY>40)topbar.classList.add('scrolled');
+  else topbar.classList.remove('scrolled');
+});
+
+/* ---- mobile drawer ---- */
+const drawer=document.getElementById('drawer');
+document.getElementById('burger').addEventListener('click',()=>drawer.classList.add('open'));
+document.getElementById('drawerClose').addEventListener('click',()=>drawer.classList.remove('open'));
+drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>drawer.classList.remove('open')));
+
+/* ---- live clock (PKT = UTC+5) ---- */
+function pad(n){return String(n).padStart(2,'0')}
+function tick(){
+  const now=new Date();
+  // local time
+  const t=pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+  document.getElementById('localTime').textContent=t;
+  const d=now.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'2-digit'});
+  document.getElementById('localDate').textContent=d;
+  // tz
+  let tz='Local';
+  try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){}
+  document.getElementById('tz').textContent=tz;
+  // hero & footer (PKT = UTC+5)
+  const utc=now.getTime()+now.getTimezoneOffset()*60000;
+  const pkt=new Date(utc+5*3600*1000);
+  const pt=pad(pkt.getHours())+':'+pad(pkt.getMinutes())+':'+pad(pkt.getSeconds());
+  document.getElementById('heroTime').textContent=pt;
+  document.getElementById('footerTime').textContent='PKT '+pt;
+}
+tick();setInterval(tick,1000);
+
+/* ---- reveal on scroll ---- */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}});
+},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---- smooth anchor scroll handled by CSS scroll-behavior ---- */
+</script>
+</body>
+</html>
